@@ -1,0 +1,4 @@
+# m     h       dom     mon     dow     user    command
+{% for item in backup_users %}
+00      *       *       *       *       {{ item }} /usr/local/bin/backup_cronjob
+{% endfor %}

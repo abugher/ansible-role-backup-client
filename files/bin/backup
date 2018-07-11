@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# Take a target host as an argument.  This script is expressly to backup from a local client to a remote server.
+
+function main {
+  start_time=$(date --iso-8601=seconds)
+
+  test 2 -le "${#}" \
+    || usage
+
+  # Sanity check filesystems' mounted state.
+  # Sanity check concurrency.  (Is this script running already?)
+
+  while 
+    case $1 in
+      -*) true ;;
+      *) false ;;
+    esac
+  do
+    case $1 in
+      '-i')
+        shift
+        initialize=1
+      ;;
+      *)
+        fail "Unrecognized argument:  ${1}"
+      ;;
+    esac
+  done
+
+  origin="${1}"
+  origin_short=$(echo $origin | sed 's/\/$//;s/^.*\///g')
+  destination_outer="${2}"
+  destination_inner_short=${origin_short}.${start_time}
+  destination_inner="${destination_outer}/${destination_inner_short}"
+  link_dest_file="${destination_outer}/link-dest"
+
+
+  link_dest_arg=''
+  if ! test 1 == "${initialize}"; then
+    test -e $link_dest_file \
+      || fail "File must exist:  ${link_dest_file}"
+    read link_dest < $link_dest_file
+    link_dest_arg="--link-dest=${link_dest}"
+  fi
+
+  output "Syncing from:  ${origin}\nTo:  ${destination_inner}"
+
+  time rsync \
+    -axHS \
+    $link_dest_arg \
+    $origin \
+    $destination_inner
+
+  ret="$?"
+
+  # Set new link-dest:
+  if [ 0 == "${ret}" ]; then
+    echo "../${destination_inner_short}" > $link_dest_file
+  fi
+
+  output "rsync returned:  ${ret}\n"
+}
+
+
+function output {
+  echo -e "${1}"
+}
+
+
+function fail {
+  output "Error:  ${1}"
+  exit 1
+}
+
+
+function usage {
+  fail "Usage:\n  ${0##*/} [-i] <source> <dest>\n\nUse -i to (re)initialize a destination with a full sync."
+}
+
+
+main "${@}"

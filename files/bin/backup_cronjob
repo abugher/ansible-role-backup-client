@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# DISTRIBUTED BY ANSIBLE
+
+. /usr/local/bin/backup > /var/log/backup.log 2>&1
+echo $? > /var/log/backup.ret
