@@ -10,6 +10,16 @@ create_files:
     mode:               '0750'
     state:              'directory'
     path:               "~{{ backup_user }}/backup"
+  - owner:              "{{ backup_user }}"
+    group:              "{{ backup_user }}"
+    mode:               '0644'
+    state:              'touch'
+    path:               '/var/log/backup.log'
+  - owner:              "{{ backup_user }}"
+    group:              "{{ backup_user }}"
+    mode:               '0644'
+    state:              'touch'
+    path:               '/var/log/backup.ret'
 install_files:
   - owner:              'root'
     group:              'root'
@@ -27,13 +37,4 @@ template_files:
     mode:               '0644'
     src:                "{{ role_path }}/templates/cron.d/backup.j2"
     dest:               '/etc/cron.d/backup'
-initialize_files:
-  - owner:              "{{ backup_user }}"
-    group:              "{{ backup_user }}"
-    mode:               '0644'
-    dest:               '/var/log/backup.log'
-  - owner:              "{{ backup_user }}"
-    group:              "{{ backup_user }}"
-    mode:               '0644'
-    dest:               '/var/log/backup.ret'
 
