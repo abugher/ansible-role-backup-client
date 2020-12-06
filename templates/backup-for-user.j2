@@ -1,0 +1,8 @@
+#!/bin/bash
+{% for backup_server in groups['backup_server'] %}
+{% if hostvars[inventory_hostname]['backup_paths'][backup_client_user] is defined %}
+{% for backup_path in hostvars[inventory_hostname]['backup_paths'][backup_client_user] %}
+rsync -rlpR "{{ backup_path }}/" "{{backup_client_user}}-at-{{ inventory_hostname}}@{{ backup_server }}":"{{ backup_prefix }}/{{ inventory_hostname }}/{{ backup_client_user }}/"
+{% endfor %}
+{% endif %}
+{% endfor %}

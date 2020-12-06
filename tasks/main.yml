@@ -1,42 +1,61 @@
 ---
+- include_vars:                 '../backup_server/vars/backup_server_parameters.yml'
+- include:                      '../tasks/install_packages.yml'
 - include:                      '../tasks/known_hosts.yml'
+  vars:
+    known_hosts:
+      - "{{ backup_server }}"
+  with_items:                   "{{ groups['backup_server'] }}"
+  loop_control:
+    loop_var:                   backup_server
 - include:                      '../tasks/users.yml'
   vars:
     users:
-      - "{{ backup_user }}"
-  with_items:                   "{{ hostvars[inventory_hostname]['backup_users'] }}"
+      - "{{ backup_client_user }}"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
-    loop_var:                   backup_user
+    loop_var:                   backup_client_user
 - include:                      '../tasks/create_files.yml'
   vars:
     create_files:
-      - owner:                  "{{ backup_user }}"
-        group:                  "{{ backup_user }}"
+      - owner:                  "{{ backup_client_user }}"
+        group:                  "{{ backup_client_user }}"
         mode:                   '0755'
         state:                  'directory'
-        path:                   "~{{ backup_user }}/.ssh"
-  with_items:                   "{{ hostvars[inventory_hostname]['backup_users'] }}"
+        path:                   "~{{ backup_client_user }}/.ssh"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
-    loop_var:                   backup_user
+    loop_var:                   backup_client_user
 - include:                      '../tasks/install_files.yml'
   vars:
     install_files:
-      - owner:                  "{{ backup_user }}"
-        group:                  "{{ backup_user }}"
+      - owner:                  "{{ backup_client_user }}"
+        group:                  "{{ backup_client_user }}"
         mode:                   '0600'
-        src:                    "../../sensitive_ansible/inventory/hosts/{{ inventory_hostname }}/users/{{ backup_user }}/files/ssh_keys/id_rsa"
-        dest:                   "~{{ backup_user }}/.ssh/id_rsa"
-  with_items:                   "{{ hostvars[inventory_hostname]['backup_users'] }}"
+        src:                    "../../sensitive_ansible/inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa"
+        dest:                   "~{{ backup_client_user }}/.ssh/id_rsa"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
-    loop_var:                   backup_user
+    loop_var:                   backup_client_user
 - include:                      '../tasks/install_files.yml'
   vars:
     install_files:
-      - owner:                  "{{ backup_user }}"
-        group:                  "{{ backup_user }}"
+      - owner:                  "{{ backup_client_user }}"
+        group:                  "{{ backup_client_user }}"
         mode:                   '0644'
-        src:                    "../inventory/hosts/{{ inventory_hostname }}/users/{{ backup_user }}/files/ssh_keys/id_rsa.pub"
-        dest:                   "~{{ backup_user }}/.ssh/id_rsa.pub"
-  with_items:                   "{{ hostvars[inventory_hostname]['backup_users'] }}"
+        src:                    "../inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa.pub"
+        dest:                   "~{{ backup_client_user }}/.ssh/id_rsa.pub"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
-    loop_var:                   backup_user
+    loop_var:                   backup_client_user
+- include:                      '../tasks/template_files.yml'
+  vars:
+    template_files:
+      - owner:                  "{{ backup_client_user }}"
+        group:                  "{{ backup_client_user }}"
+        mode:                   '0700'
+        src:                    'templates/backup-for-user.j2'
+        dest:                   "/usr/local/bin/backup-for-{{ backup_client_user }}"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
+  loop_control:
+    loop_var:                   backup_client_user

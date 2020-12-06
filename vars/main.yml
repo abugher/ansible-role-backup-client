@@ -1,3 +1,3 @@
 ---
-known_hosts:
-  - "{{ backup_server }}"
+install_packages:
+  - 'rsync'
