@@ -1,5 +1,42 @@
 ---
 - include:                      '../tasks/known_hosts.yml'
+- include:                      '../tasks/users.yml'
+  vars:
+    users:
+      - "{{ backup_user }}"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_users'] }}"
+  loop_control:
+    loop_var:                   backup_user
 - include:                      '../tasks/create_files.yml'
+  vars:
+    create_files:
+      - owner:                  "{{ backup_user }}"
+        group:                  "{{ backup_user }}"
+        mode:                   '0755'
+        state:                  'directory'
+        path:                   "~{{ backup_user }}/.ssh"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_users'] }}"
+  loop_control:
+    loop_var:                   backup_user
 - include:                      '../tasks/install_files.yml'
-- include:                      '../tasks/template_files.yml'
+  vars:
+    install_files:
+      - owner:                  "{{ backup_user }}"
+        group:                  "{{ backup_user }}"
+        mode:                   '0600'
+        src:                    "../../sensitive_ansible/inventory/hosts/{{ inventory_hostname }}/users/{{ backup_user }}/files/ssh_keys/id_rsa"
+        dest:                   "~{{ backup_user }}/.ssh/id_rsa"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_users'] }}"
+  loop_control:
+    loop_var:                   backup_user
+- include:                      '../tasks/install_files.yml'
+  vars:
+    install_files:
+      - owner:                  "{{ backup_user }}"
+        group:                  "{{ backup_user }}"
+        mode:                   '0644'
+        src:                    "../inventory/hosts/{{ inventory_hostname }}/users/{{ backup_user }}/files/ssh_keys/id_rsa.pub"
+        dest:                   "~{{ backup_user }}/.ssh/id_rsa.pub"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_users'] }}"
+  loop_control:
+    loop_var:                   backup_user
