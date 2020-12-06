@@ -1,0 +1,15 @@
+#!/bin/bash
+log="/var/log/backup-for-{{ backup_client_user }}.log"
+
+> "${log}"
+
+{% for backup_server in groups['backup_server'] %}
+{% if hostvars[inventory_hostname]['backup_paths'][backup_client_user] is defined %}
+{% for backup_path in hostvars[inventory_hostname]['backup_paths'][backup_client_user] %}
+echo >> "${log}"
+echo >> "${log}"
+echo "Backing up {{ backup_path }}:" >> "${log}"
+time rsync -rlpR "{{ backup_path }}/" "{{backup_client_user}}-at-{{ inventory_hostname}}@{{ backup_server }}":"{{ backup_prefix }}/{{ inventory_hostname }}/{{ backup_client_user }}/" >> "${log}"
+{% endfor %}
+{% endif %}
+{% endfor %}

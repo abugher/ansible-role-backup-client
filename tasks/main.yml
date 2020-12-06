@@ -23,6 +23,11 @@
         mode:                   '0755'
         state:                  'directory'
         path:                   "~{{ backup_client_user }}/.ssh"
+      - owner:                  "{{ backup_client_user }}"
+        group:                  "{{ backup_client_user }}"
+        mode:                   '0640'
+        state:                  'touch'
+        path:                   "/var/log/backup-for-{{ backup_client_user }}.log"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
@@ -51,11 +56,22 @@
 - include:                      '../tasks/template_files.yml'
   vars:
     template_files:
-      - owner:                  "{{ backup_client_user }}"
+      - owner:                  'root'
         group:                  "{{ backup_client_user }}"
-        mode:                   '0700'
-        src:                    'templates/backup-for-user.j2'
+        mode:                   '0750'
+        src:                    'templates/bin/backup-for-user.j2'
         dest:                   "/usr/local/bin/backup-for-{{ backup_client_user }}"
+  with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
+  loop_control:
+    loop_var:                   backup_client_user
+- include:                      '../tasks/template_files.yml'
+  vars:
+    template_files:
+      - owner:                  'root'
+        group:                  'root'
+        mode:                   '0644'
+        src:                    'templates/cron.d/backup-for-user.j2'
+        dest:                   "/etc/cron.d/backup-for-{{ backup_client_user }}"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
