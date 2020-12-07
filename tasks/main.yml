@@ -28,6 +28,11 @@
         mode:                   '0640'
         state:                  'touch'
         path:                   "/var/log/backup-for-{{ backup_client_user }}.log"
+      - owner:                  "{{ backup_client_user }}"
+        group:                  "{{ backup_client_user }}"
+        mode:                   '0640'
+        state:                  'touch'
+        path:                   "/var/log/backup-for-{{ backup_client_user }}.ret"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
