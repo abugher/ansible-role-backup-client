@@ -13,7 +13,7 @@ function backup() {
   echo
   echo
   echo "Backing up {{ backup_path }}:"
-  time rsync -rlpR "{{ backup_path }}/" "{{backup_client_user}}-at-{{ inventory_hostname}}@{{ backup_server }}":"{{ hostvars[backup_server]['backup_prefix'] }}/{{ inventory_hostname }}/{{ backup_client_user }}/"
+  time rsync -rlpR --delete "{{ backup_path }}/" "{{backup_client_user}}-at-{{ inventory_hostname}}@{{ backup_server }}":"{{ hostvars[backup_server]['backup_prefix'] }}/{{ inventory_hostname }}/{{ backup_client_user }}/"
   rets+=( "${?}" )
 {% endfor %}
 {% endif %}
