@@ -19,7 +19,7 @@
     create_files:
       - owner:                  "{{ backup_client_user }}"
         group:                  "{{ backup_client_user }}"
-        mode:                   '0755'
+        mode:                   '0700'
         state:                  'directory'
         path:                   "~{{ backup_client_user }}/.ssh"
       - owner:                  "{{ backup_client_user }}"
