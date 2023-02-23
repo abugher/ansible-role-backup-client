@@ -1,4 +1,0 @@
----
-dependencies:
-  - role:       'ssh_client'
-    when:       skipdeps is not defined
