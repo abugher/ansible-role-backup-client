@@ -41,7 +41,7 @@
       - owner:                  "{{ backup_client_user }}"
         group:                  "{{ backup_client_user }}"
         mode:                   '0600'
-        src:                    "../../sensitive_ansible/inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa"
+        src:                    "../../sensitive-ansible/inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa"
         dest:                   "~{{ backup_client_user }}/.ssh/id_rsa"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
