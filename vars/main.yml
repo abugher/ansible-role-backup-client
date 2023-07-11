@@ -1,4 +1,4 @@
 ---
 install_packages:
   - 'rsync'
-  - 'ssh-client'
+  - 'openssh-client'
