@@ -4,7 +4,7 @@
   vars:
     known_hosts:
       - "{{ backup_server }}"
-  with_items:                   "{{ groups['backup_server'] }}"
+  with_items:                   "{{ groups['backup-server'] }}"
   loop_control:
     loop_var:                   backup_server
 - include:                      '../tasks/users.yml'
