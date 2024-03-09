@@ -1,20 +1,20 @@
 ---
-- include:                      '../tasks/install_packages.yml'
-- include:                      '../tasks/known_hosts.yml'
+- include_tasks:                '../tasks/install_packages.yml'
+- include_tasks:                '../tasks/known_hosts.yml'
   vars:
     known_hosts:
       - "{{ backup_server }}"
   with_items:                   "{{ groups['backup-server'] }}"
   loop_control:
     loop_var:                   backup_server
-- include:                      '../tasks/users.yml'
+- include_tasks:                '../tasks/users.yml'
   vars:
     users:
       - "{{ backup_client_user }}"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
-- include:                      '../tasks/create_files.yml'
+- include_tasks:                '../tasks/create_files.yml'
   vars:
     create_files:
       - owner:                  "{{ backup_client_user }}"
@@ -35,7 +35,7 @@
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
-- include:                      '../tasks/install_files.yml'
+- include_tasks:                '../tasks/install_files.yml'
   vars:
     install_files:
       - owner:                  "{{ backup_client_user }}"
@@ -46,7 +46,7 @@
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
-- include:                      '../tasks/install_files.yml'
+- include_tasks:                '../tasks/install_files.yml'
   vars:
     install_files:
       - owner:                  "{{ backup_client_user }}"
@@ -57,7 +57,7 @@
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
-- include:                      '../tasks/template_files.yml'
+- include_tasks:                '../tasks/template_files.yml'
   vars:
     template_files:
       - owner:                  'root'
@@ -68,7 +68,7 @@
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
-- include:                      '../tasks/template_files.yml'
+- include_tasks:                '../tasks/template_files.yml'
   vars:
     template_files:
       - owner:                  'root'
