@@ -32,6 +32,11 @@
         mode:                   '0644'
         state:                  'touch'
         path:                   "/var/log/backup-for-{{ backup_client_user }}.ret"
+      - owner:                  "{{ backup_client_user }}"
+        group:                  "{{ backup_client_user }}"
+        mode:                   '0644'
+        state:                  'touch'
+        path:                   "/var/log/backup-for-{{ backup_client_user }}.pid"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
@@ -65,6 +70,11 @@
         mode:                   '0750'
         src:                    'templates/bin/backup-for-user.j2'
         dest:                   "/usr/local/bin/backup-for-{{ backup_client_user }}"
+      - owner:                  'root'
+        group:                  "{{ backup_client_user }}"
+        mode:                   '0750'
+        src:                    'templates/bin/backup-for-user-cronjob.j2'
+        dest:                   "/usr/local/bin/backup-for-{{ backup_client_user }}-cronjob"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user

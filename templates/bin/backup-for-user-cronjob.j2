@@ -1,0 +1,18 @@
+#!/bin/bash
+
+export log_file="/var/log/backup-for-{{ backup_client_user }}.log"
+export ret_file="/var/log/backup-for-{{ backup_client_user }}.ret"
+export lock_file="/var/log/backup-for-{{ backup_client_user }}.pid"
+
+flock -n "${lock_file}" -c '
+  echo $$ > "${lock_file}"
+  ps -lfp $$ >> "${lock_file}"
+  /usr/local/bin/backup-for-{{ backup_client_user }} > "${log_file}" 2>&1
+  echo "${?}" > "${ret_file}"
+'
+ret="${?}"
+
+if ! test 0 = "${ret}"; then
+  echo "Lock failure:  '${ret}'"
+  exit "${ret}"
+fi
