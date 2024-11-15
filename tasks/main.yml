@@ -29,6 +29,11 @@
         path:                   "/var/log/backup-for-{{ backup_client_user }}.log"
       - owner:                  "{{ backup_client_user }}"
         group:                  "{{ backup_client_user }}"
+        mode:                   '0640'
+        state:                  'touch'
+        path:                   "/var/log/backup-for-{{ backup_client_user }}.old.log"
+      - owner:                  "{{ backup_client_user }}"
+        group:                  "{{ backup_client_user }}"
         mode:                   '0644'
         state:                  'touch'
         path:                   "/var/log/backup-for-{{ backup_client_user }}.ret"

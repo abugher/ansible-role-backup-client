@@ -1,12 +1,14 @@
 #!/bin/bash
 
 export log_file="/var/log/backup-for-{{ backup_client_user }}.log"
+export old_log_file="/var/log/backup-for-{{ backup_client_user }}.old.log"
 export ret_file="/var/log/backup-for-{{ backup_client_user }}.ret"
 export lock_file="/var/log/backup-for-{{ backup_client_user }}.pid"
 
 flock -n "${lock_file}" -c '
   echo $$ > "${lock_file}"
   ps -lfp $$ >> "${lock_file}"
+  cat > "${old_log_file}" < "${log_file}"
   /usr/local/bin/backup-for-{{ backup_client_user }} > "${log_file}" 2>&1
   echo "${?}" > "${ret_file}"
 '
