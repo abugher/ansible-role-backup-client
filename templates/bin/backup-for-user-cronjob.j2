@@ -4,7 +4,13 @@ export log_file="/var/log/backup-for-{{ backup_client_user }}.log"
 export old_log_file="/var/log/backup-for-{{ backup_client_user }}.old.log"
 export ret_file="/var/log/backup-for-{{ backup_client_user }}.ret"
 export lock_file="/var/log/backup-for-{{ backup_client_user }}.pid"
-export log="logger -t '${log_tag}'"
+export log_early="/tmp/${log_tag}.early.log"
+
+
+function log() {
+  echo "${1}" >> "${log_early}"
+}
+
 
 # flock must have a command argument.  Inspect `man flock`, SYNOPSIS.
 if ! flock -n "${lock_file}" -c '
@@ -15,17 +21,17 @@ if ! flock -n "${lock_file}" -c '
   echo "${?}" > "${ret_file}"
 '; then
   ret="${?}"
-  $log "Lock failure:  '${ret}'"
-  $log "Lock held by PID:  $(
+  log "Lock failure:  '${ret}'"
+  log "Lock held by PID:  $(
     head -n 1 "${lock_file}"
   )"
-  $log "$(
+  log "$(
     tail -n 1 "${lock_file}"
   )"
   exit "${ret}"
 fi
 
-$log "Lock released.  flock return status:  ${?}"
+log "Lock released.  flock return status:  ${?}"
 
 # Removing the lock file, before or after unlocking, breaks flock's
 # expectations.  Just leave it.
