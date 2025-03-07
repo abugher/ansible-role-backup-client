@@ -15,17 +15,19 @@ To add a backup client:
 
 # Notes
 
-## checksum matching
+## snapshots and timestamps
 
-In the backup script, `rsync` should get `-c` for checksum matching.
-Otherwise, many files get synced every time.  The extra syncs may be due
-to timestamp mismatch, possibly caused by filesystem differences, but
-that is unconfirmed.  
+`rsync` must have the `-t` option, causing timestamps to be updated.
+Otherwise, `rsync` always thinks the files have changed.  In addition to
+burdening the network and slowing the transfer, this causes `btrfs`
+"copy on write" model to kick in, duplicating storage allocation that
+would otherwise be shared with existing snapshots, so that ongoing
+snapshots each consume storage similar in size to the contents of the
+filesystem.  The result is that, if `-t` is not given to `rsync` during
+backup, backup storage consumption rises by 100% of actual backed up
+data size, every day.
 
-Resulting from the extra sync, each snapshot seems to contain a full
-copy of each updated file, judging from snapshot sizes.  With `-c` in
-place for backup jobs, when nothing is actually changed, snapshots have
-zero size.  
-
-Backups are also running faster, at 9 minutes vs 161 minutes for the
-same directory.
+The `-c` option, for checksum matching, is almost as good.  It takes
+about 50 times longer than checking timestamps, but should result in no
+extra space used.  It takes about 1/10 as long as a full transfer.
+(Numeric comparisons reflect my processing and networking resources.)
