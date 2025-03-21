@@ -9,7 +9,7 @@ rets=()
 {% if hostvars[inventory_hostname]['backup_paths'][backup_client_user] is defined %}
 {% for backup_path in hostvars[inventory_hostname]['backup_paths'][backup_client_user] %}
 echo -e "\n\nBacking up {{ backup_path }}:"
-time rsync -rlptR --delete "{{ backup_path }}/" "{{ backup_client_user }}-at-{{ inventory_hostname}}@{{ backup_server }}":"{{ hostvars[backup_server]['backup_prefix'] }}/{{ inventory_hostname }}/{{ backup_client_user }}/"
+time rsync -rlptR --delete --inplace --no-whole-file "{{ backup_path }}/" "{{ backup_client_user }}-at-{{ inventory_hostname}}@{{ backup_server }}":"{{ hostvars[backup_server]['backup_prefix'] }}/{{ inventory_hostname }}/{{ backup_client_user }}/"
 ret="${?}"
 echo "Returned:  ${ret}"
 rets+=( "${ret}" )
