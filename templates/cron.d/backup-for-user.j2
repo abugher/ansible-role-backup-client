@@ -1,3 +1,3 @@
 #!/bin/bash
 # m     h       dom     mon     dow     user    command
-{{ backup_minute }}     {{ backup_hour }}       *       *       *       {{ backup_client_user }}  "/usr/local/bin/backup-for-{{ backup_client_user }}-cronjob"
+{{ backup_minute }}     *       *       *       *       {{ backup_client_user }}  "/usr/local/bin/backup-for-{{ backup_client_user }}-cronjob"
