@@ -1,9 +1,10 @@
 #!/bin/bash
 
-export log_file="/var/log/backup-for-{{ backup_client_user }}.log"
-export old_log_file="/var/log/backup-for-{{ backup_client_user }}.old.log"
-export ret_file="/var/log/backup-for-{{ backup_client_user }}.ret"
-export lock_file="/var/log/backup-for-{{ backup_client_user }}.pid"
+export log_tag="backup-for-{{ backup_client_user }}"
+export log_file="/var/log/${log_tag}.log"
+export old_log_file="/var/log/${log_tag}.old.log"
+export ret_file="/var/log/${log_tag}.ret"
+export lock_file="/var/log/${log_tag}.pid"
 export log_early="/tmp/${log_tag}.early.log"
 
 
