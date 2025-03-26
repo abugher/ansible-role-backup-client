@@ -8,8 +8,18 @@ rets=()
 {% for backup_server in groups['backup-server'] %}
 {% if hostvars[inventory_hostname]['backup_paths'][backup_client_user] is defined %}
 {% for backup_path in hostvars[inventory_hostname]['backup_paths'][backup_client_user] %}
-echo -e "\n\nBacking up {{ backup_path }}:"
-time rsync -rlptR --delete --inplace --no-whole-file "{{ backup_path }}/" "{{ backup_client_user }}-at-{{ inventory_hostname}}@{{ backup_server }}":"{{ hostvars[backup_server]['backup_prefix'] }}/{{ inventory_hostname }}/{{ backup_client_user }}/"
+echo -e "\n\nBacking up path:  '{{ backup_path }}':"
+time rsync -rlptR --delete "{{ backup_path }}/" "{{ backup_client_user }}-at-{{ inventory_hostname}}@{{ backup_server }}":"{{ hostvars[backup_server]['backup_prefix'] }}/{{ inventory_hostname }}/{{ backup_client_user }}/"
+ret="${?}"
+echo "Returned:  ${ret}"
+rets+=( "${ret}" )
+
+{% endfor %}
+{% endif %}
+{% if hostvars[inventory_hostname]['backup_database_paths'][backup_client_user] is defined %}
+{% for backup_database_path in hostvars[inventory_hostname]['backup_database_paths'][backup_client_user] %}
+echo -e "\n\nBacking up database:  '{{ backup_database_path }}':"
+time rsync -rlptR --delete --inplace --no-whole-file "{{ backup_database_path }}/" "{{ backup_client_user }}-at-{{ inventory_hostname}}@{{ backup_server }}":"{{ hostvars[backup_server]['backup_prefix'] }}/{{ inventory_hostname }}/{{ backup_client_user }}/"
 ret="${?}"
 echo "Returned:  ${ret}"
 rets+=( "${ret}" )
