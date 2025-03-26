@@ -15,6 +15,20 @@ To add a backup client:
 
 # Notes
 
+## role dependency
+
+### summary
+
+It may be necessary to deploy other roles before this one, and they
+cannot be tracked as dependencies.
+
+### rationale
+
+This role may not deploy until certain other roles have been deployed to
+the target at least once, as users specified for backup may not yet
+exist until that time.  The requisite roles and users will vary among
+target hosts.
+
 ## snapshots and timestamps
 
 ### summary
