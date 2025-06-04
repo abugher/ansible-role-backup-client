@@ -7,49 +7,42 @@
   with_items:                   "{{ groups['backup-server'] }}"
   loop_control:
     loop_var:                   backup_server
-- include_tasks:                '../tasks/users.yml'
-  vars:
-    users:
-      - "{{ backup_client_user }}"
-  with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
-  loop_control:
-    loop_var:                   backup_client_user
 - include_tasks:                '../tasks/create_files.yml'
   vars:
     create_files:
-      - owner:                  "{{ backup_client_user }}"
-        group:                  "{{ backup_client_user }}"
+      - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0700'
         state:                  'directory'
         path:                   "~{{ backup_client_user }}/.ssh"
-      - owner:                  "{{ backup_client_user }}"
-        group:                  "{{ backup_client_user }}"
+      - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0640'
         state:                  'touch'
-        path:                   "/var/log/backup-for-{{ backup_client_user }}.log"
-      - owner:                  "{{ backup_client_user }}"
-        group:                  "{{ backup_client_user }}"
+        path:                   "{{ hostvars[inventory_hostname]['log_dir']|default('/var/log') }}/backup-for-{{ backup_client_user }}.log"
+      - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0640'
         state:                  'touch'
-        path:                   "/var/log/backup-for-{{ backup_client_user }}.old.log"
-      - owner:                  "{{ backup_client_user }}"
-        group:                  "{{ backup_client_user }}"
+        path:                   "{{ hostvars[inventory_hostname]['log_dir']|default('/var/log') }}/backup-for-{{ backup_client_user }}.old.log"
+      - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0644'
         state:                  'touch'
-        path:                   "/var/log/backup-for-{{ backup_client_user }}.ret"
-      - owner:                  "{{ backup_client_user }}"
-        group:                  "{{ backup_client_user }}"
+        path:                   "{{ hostvars[inventory_hostname]['log_dir']|default('/var/log') }}/backup-for-{{ backup_client_user }}.ret"
+      - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0644'
         state:                  'touch'
-        path:                   "/var/log/backup-for-{{ backup_client_user }}.pid"
+        path:                   "{{ hostvars[inventory_hostname]['log_dir']|default('/var/log') }}/backup-for-{{ backup_client_user }}.pid"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
 - include_tasks:                '../tasks/install_files.yml'
   vars:
     install_files:
-      - owner:                  "{{ backup_client_user }}"
-        group:                  "{{ backup_client_user }}"
+      - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0600'
         src:                    "../../sensitive-ansible/inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa"
         dest:                   "~{{ backup_client_user }}/.ssh/id_rsa"
@@ -59,8 +52,8 @@
 - include_tasks:                '../tasks/install_files.yml'
   vars:
     install_files:
-      - owner:                  "{{ backup_client_user }}"
-        group:                  "{{ backup_client_user }}"
+      - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0644'
         src:                    "../inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa.pub"
         dest:                   "~{{ backup_client_user }}/.ssh/id_rsa.pub"
@@ -70,27 +63,27 @@
 - include_tasks:                '../tasks/template_files.yml'
   vars:
     template_files:
-      - owner:                  'root'
-        group:                  "{{ backup_client_user }}"
+      - owner:                  "{{ backup_client_local_user|default('root') }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0750'
         src:                    'templates/bin/backup-for-user.j2'
-        dest:                   "/usr/local/bin/backup-for-{{ backup_client_user }}"
-      - owner:                  'root'
-        group:                  "{{ backup_client_user }}"
+        dest:                   "{{ hostvars[inventory_hostname]['bin_dir']|default('/usr/local/bin') }}/backup-for-{{ backup_client_user }}"
+      - owner:                  "{{ backup_client_local_user|default('root') }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0750'
         src:                    'templates/bin/backup-for-user-cronjob.j2'
-        dest:                   "/usr/local/bin/backup-for-{{ backup_client_user }}-cronjob"
+        dest:                   "{{ hostvars[inventory_hostname]['bin_dir']|default('/usr/local/bin') }}/backup-for-{{ backup_client_user }}-cronjob"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
 - include_tasks:                '../tasks/template_files.yml'
   vars:
     template_files:
-      - owner:                  'root'
-        group:                  'root'
+      - owner:                  "{{ backup_client_local_user|default('root') }}"
+        group:                  "{{ backup_client_local_user|default('root') }}"
         mode:                   '0644'
         src:                    'templates/cron.d/backup-for-user.j2'
-        dest:                   "/etc/cron.d/backup-for-{{ backup_client_user }}"
+        dest:                   "{{ hostvars[inventory_hostname]['cron_dir']|default('/etc/cron.d') }}/backup-for-{{ backup_client_user }}"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
