@@ -1,15 +1,15 @@
-#!/bin/bash
+#!{{ bash_path|default('/bin/bash') }}
 
 export log_tag="backup-for-{{ backup_client_user }}"
-export log_file="/var/log/${log_tag}.log"
-export old_log_file="/var/log/${log_tag}.old.log"
-export ret_file="/var/log/${log_tag}.ret"
-export lock_file="/var/log/${log_tag}.pid"
-export log_early="/tmp/${log_tag}.early.log"
+export log_file="{{ log_dir|default('/var/log') }}/${log_tag}.log"
+export old_log_file="{{ log_dir|default('/var/log') }}/${log_tag}.old.log"
+export ret_file="{{ log_dir|default('/var/log') }}/${log_tag}.ret"
+export lock_file="{{ log_dir|default('/var/log') }}/${log_tag}.pid"
+export log_failure="{{ log_dir|default('/var/log') }}/${log_tag}.failure.log"
 
 
 function log() {
-  echo "${1}" >> "${log_early}"
+  echo "${1}" >> "${log_failure}"
 }
 
 
@@ -18,7 +18,7 @@ if ! flock -n "${lock_file}" -c '
   echo $$ > "${lock_file}"
   ps -lfp $$ >> "${lock_file}"
   cat > "${old_log_file}" < "${log_file}"
-  /usr/local/bin/backup-for-{{ backup_client_user }} > "${log_file}" 2>&1
+  {{ bin_dir|default('/usr/local/bin') }}/backup-for-{{ backup_client_user }} > "${log_file}" 2>&1
   echo "${?}" > "${ret_file}"
 '; then
   ret="${?}"
@@ -31,8 +31,6 @@ if ! flock -n "${lock_file}" -c '
   )"
   exit "${ret}"
 fi
-
-log "Lock released.  flock return status:  ${?}"
 
 # Removing the lock file, before or after unlocking, breaks flock's
 # expectations.  Just leave it.

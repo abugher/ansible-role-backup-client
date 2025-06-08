@@ -14,7 +14,7 @@
         group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0700'
         state:                  'directory'
-        path:                   "~{{ backup_client_user }}/.ssh"
+        path:                   "{{ home_dir|default('~' + backup_client_user ) }}/.ssh"
       - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0640'
@@ -25,6 +25,11 @@
         mode:                   '0640'
         state:                  'touch'
         path:                   "{{ hostvars[inventory_hostname]['log_dir']|default('/var/log') }}/backup-for-{{ backup_client_user }}.old.log"
+      - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
+        group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
+        mode:                   '0640'
+        state:                  'touch'
+        path:                   "{{ hostvars[inventory_hostname]['log_dir']|default('/var/log') }}/backup-for-{{ backup_client_user }}.failure.log"
       - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0644'
@@ -45,7 +50,7 @@
         group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0600'
         src:                    "../../sensitive-ansible/inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa"
-        dest:                   "~{{ backup_client_user }}/.ssh/id_rsa"
+        dest:                   "{{ home_dir|default('~' + backup_client_user) }}/.ssh/id_rsa"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
@@ -56,7 +61,7 @@
         group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0644'
         src:                    "../inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa.pub"
-        dest:                   "~{{ backup_client_user }}/.ssh/id_rsa.pub"
+        dest:                   "{{ home_dir|default('~' + backup_client_user) }}/.ssh/id_rsa.pub"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
@@ -76,10 +81,13 @@
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
     loop_var:                   backup_client_user
+# cron.d/* must be owned by root and not writable by group or other.
+# Override `become` with `ansible_become`.
 - include_tasks:                '../tasks/template_files.yml'
   vars:
+    ansible_become:             True
     template_files:
-      - owner:                  "{{ backup_client_local_user|default('root') }}"
+      - owner:                  'root'
         group:                  "{{ backup_client_local_user|default('root') }}"
         mode:                   '0644'
         src:                    'templates/cron.d/backup-for-user.j2'
