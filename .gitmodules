@@ -9,4 +9,4 @@
 	url = ../../ansible-environment.git
 [submodule "sensitive-inventory"]
 	path = sensitive-inventory
-	url = ansible@files:/storage/control-center/sensitive-ansible-inventory.git
+	url = ../../sensitive-ansible-inventory.git
