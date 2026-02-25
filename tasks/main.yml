@@ -49,7 +49,7 @@
       - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0600'
-        src:                    "sensitive-inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa"
+        src:                    "{{ sensitive_inventory_path }}/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa"
         dest:                   "{{ home_dir|default('~' + backup_client_user) }}/.ssh/id_rsa"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
@@ -60,7 +60,7 @@
       - owner:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         group:                  "{{ backup_client_local_user|default(backup_client_user) }}"
         mode:                   '0644'
-        src:                    "inventory/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa.pub"
+        src:                    "{{ inventory_path }}/hosts/{{ inventory_hostname }}/users/{{ backup_client_user }}/files/ssh_keys/id_rsa.pub"
         dest:                   "{{ home_dir|default('~' + backup_client_user) }}/.ssh/id_rsa.pub"
   with_items:                   "{{ hostvars[inventory_hostname]['backup_client_users'] }}"
   loop_control:
