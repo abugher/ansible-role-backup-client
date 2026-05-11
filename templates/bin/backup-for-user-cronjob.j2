@@ -1,4 +1,4 @@
-#!{{ bash_path|default('/bin/bash') }}
+#!{{ hostvars[inventory_hostname]['bash_path']|default('/bin/bash') }}
 
 export log_tag="backup-for-{{ backup_client_user }}"
 export log_file="{{ log_dir|default('/var/log') }}/${log_tag}.log"

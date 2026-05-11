@@ -1,4 +1,4 @@
-#!{{ bash_path|default('/bin/bash') }}
+#!{{ hostvars[inventory_hostname]['bash_path']|default('/bin/bash') }}
 
 #> "${log_file}"
 #> "${ret_file}"
